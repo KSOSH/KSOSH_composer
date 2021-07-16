@@ -1,10 +1,16 @@
 {
 	"name": "projectsoft/gboyksosh",
 	"description": "Composer для сайта ГБОУ СОШ пос. Комсомольский",
+	"keywords": [],
+	"homepage": "https://github.com/KSOSH/KSOSH_composer",
+	"type": "library",
+	"minimum-stability": "dev",
+	"prefer-stable": true,
+	"license": "GPL-3.0",
 	"authors": [
 		{
 			"name": "ProjectSoft",
-			"homepage": "https://github.com/KSOSH/KSOSH_composer"
+			"homepage": "https://github.com/ProjectSoft-STUDIONIONS"
 		}
 	],
 	"require": {
@@ -17,6 +23,5 @@
 		"psr-4": {
 			"ProjectSoft\\": "/src"
 		}
-	},
-	"minimum-stability": "dev"
+	}
 }
