@@ -4,7 +4,7 @@ namespace ProjectSoft;
 /**
  * Отправка сообщения на канал Telegram
  * 
- 	$modx->invokeEvent('OnSendBot', array(
+	$modx->invokeEvent('onSendBot', array(
 		'types' => {
 			'date':		'Дата',
 			'theme':	'Тема',
@@ -49,58 +49,52 @@ class SendBot {
 
 	public function __construct($params)
 	{
-		/**
-		 * $params['types']
-		 * $params['fields']
-		 * $params['before_msg']
-		 * $params['after_msg']
-		 * $params['bot_token']
-		 * $params['chat_id']
-		 **/
-		//$this->modx = EvolutionCMS();
-		$this->types = is_object($params['types']) ? $params['types'] : {};
-		$this->fields = is_object($params['fields']) ? $params['fields'] : {};
-		$this->before_msg = is_string($params['before_msg']) ? $params['before_msg'] : '';
-		$this->after_msg = is_string($params['after_msg']) ? $params['after_msg'] : '';
+		$this->types = is_array($params['types']) ? $params['types'] : array();
+		$this->fields = is_array($params['fields']) ? $params['fields'] : array();
+		$this->before_msg = is_string($params['before_msg']) ? $params['before_msg'] : "";
+		$this->after_msg = is_string($params['after_msg']) ? $params['after_msg'] : "";
 		$this->bot_token = $params['bot_token'];
 		$this->chat_id = $params['chat_id'];
-		$this->parse_mode = is_string($params['parse_mode']) ? ($params['parse_mode'] == 'HTML' ? 'HTML' : 'Markdown') : 'Markdown';
-		$this->disable_web_page_preview = is_string($params['disable_web_page_preview']) ? ($params['disable_web_page_preview'] == 'false' ? 'false' : 'true') : 'true';
+		$this->disable_web_page_preview = "&disable_web_page_preview=" . (is_string($params['disable_web_page_preview']) ? ($params['disable_web_page_preview'] == "false" ? "false" : "true") : "true");
 		$this->msg = $this->setData();
 		$this->url = $this->formatUrl();
-		print_r($this);
-		//$result = $this->send($this->url);
 	}
 
 	private function setData()
 	{
-		$msg = $this->parse_mode == 'HTML' ? '<table><tbody>' : '';
+		$msg = '';
+		$sep = "\n";
 		foreach($this->types as $key => $value)
 		{
-			if($this->parse_mode == 'HTML')
+			$val = trim($this->fields[$key]);
+			if(mb_strlen($val) > 1)
 			{
-				$msg .= '<tr><td><b>' . $value . '</b></td>';
-				$msg .= '<td>' . $this->fields[$key] . '</td></tr>';
-			}
-			else
-			{
-				$msg .= '*' . $value . '* ' . $this->fields[$key] . '\r\n';
+				$msg .= '*' . $value . ':* ' . $val . "\n";
 			}
 		}
-		$msg .= $this->parse_mode == 'HTML' ? '</tbody></table><br>' : '\r\n';
-		return $msg;
+		$this->before_msg = trim($this->before_msg);
+		if(mb_strlen($this->before_msg)>1)
+		{
+			$this->before_msg .= "\n\n";
+		}
+		$this->after_msg = trim($this->after_msg);
+		if(mb_strlen($this->after_msg)>1)
+		{
+			$this->after_msg = "\n\n" . $this->after_msg;
+		}
+		return $this->before_msg . trim($msg) . $this->after_msg;
 	}
 
 	private function formatUrl()
 	{
-		// Format url
 		$parse_mode = '&parse_mode=' . $this->parse_mode;
-		$disable_web_page_preview = '&disable_web_page_preview=' . $disable_web_page_preview;
+		$disable_web_page_preview = $this->disable_web_page_preview;
 		$url = self::API . $this->bot_token . '/sendMessage?chat_id=' . $this->chat_id . '&text=' . urlencode($this->msg) . $parse_mode . $disable_web_page_preview;
 		return $url;
 	}
 
-	public function send($url){
+	public function send(){
+		$url = $this->url;
 		$ch = curl_init();
 		$optArray = array(
 				CURLOPT_URL => $url,
