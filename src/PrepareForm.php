@@ -14,5 +14,15 @@ class PrepareForm {
 		$id = $modx->documentIdentifier;
 		$url = $modx->makeUrl($id, '', '', 'full');
 		$fl->setField("url", $url);
+		$fl->setField("theme", "Заказать звонок");
+		switch ($name) {
+			case 'prepare':
+				// code...
+				break;
+
+			default:
+				// code...
+				break;
+		}
 	}
 }
