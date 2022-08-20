@@ -43,9 +43,9 @@ class SendBot {
 	private $bot_token;
 	private $chat_id;
 	private $parse_mode = 'Markdown';
-	private $disable_web_page_preview = 'true';
 	private $msg = '';
 	private $url = '';
+	private $disable_web_page_preview = '';
 
 	public function __construct($params)
 	{
@@ -53,9 +53,9 @@ class SendBot {
 		$this->fields = is_array($params['fields']) ? $params['fields'] : array();
 		$this->before_msg = is_string($params['before_msg']) ? $params['before_msg'] : "";
 		$this->after_msg = is_string($params['after_msg']) ? $params['after_msg'] : "";
+		$this->disable_web_page_preview = is_string($params['disable_web_page_preview']) ? ($params['disable_web_page_preview'] == 'false' ? '&disable_web_page_preview=false' : '&disable_web_page_preview=true') : '&disable_web_page_preview=true';
 		$this->bot_token = $params['bot_token'];
 		$this->chat_id = $params['chat_id'];
-		$this->disable_web_page_preview = "&disable_web_page_preview=" . (is_string($params['disable_web_page_preview']) ? ($params['disable_web_page_preview'] == "false" ? "false" : "true") : "true");
 		$this->msg = $this->setData();
 		$this->url = $this->formatUrl();
 	}
@@ -88,8 +88,7 @@ class SendBot {
 	private function formatUrl()
 	{
 		$parse_mode = '&parse_mode=' . $this->parse_mode;
-		$disable_web_page_preview = $this->disable_web_page_preview;
-		$url = self::API . $this->bot_token . '/sendMessage?chat_id=' . $this->chat_id . '&text=' . urlencode($this->msg) . $parse_mode . $disable_web_page_preview;
+		$url = self::API . $this->bot_token . '/sendMessage?chat_id=' . $this->chat_id . '&text=' . urlencode($this->msg) . $parse_mode . $this->disable_web_page_preview;
 		return $url;
 	}
 
