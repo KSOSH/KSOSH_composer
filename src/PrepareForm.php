@@ -19,8 +19,8 @@ class PrepareForm {
 				break;
 		}
 		$fl->mailConfig['subject']  = $cfg["subject"] = mb_strtoupper($theme_val, $modx->config['modx_charset']) . " с сайта «" . $site . "»";
-		$fl->mailConfig['replyTo']  = $cfg["replyTo"] = $modx->config['emailsender'];
-		$fl->mailConfig['fromName']  = $cfg["fromName"] = 'Робот сайта «' . $site . '»';
+		$fl->mailConfig['replyTo']  = $cfg["replyTo"] = $modx->config['email_bot'];
+		$fl->mailConfig['fromName']  = $cfg["fromName"] = $modx->config['email_bot_name'];
 		$fl->config->setConfig($cfg);
 	}
 
