@@ -107,6 +107,8 @@ class PrepareDL {
 			'templates' => 'json'
 		));
 		$result = preg_replace($re, $subst, $arrstr);
+		$obj = json_decode($result);
+		$result = htmlspecialchars(json_encode($obj), ENT_QUOTES, 'UTF-8');
 		$data["json"] = $result;
 		$image = $modx->runSnippet("phpthumb", array(
 			'input' => $data['imageSoc'],
