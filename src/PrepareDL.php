@@ -97,24 +97,4 @@ class PrepareDL {
 		</p>';
 		return $data;
 	}
-
-	public static function prepareWork(array $data, \DocumentParser $modx, $_DL, \prepare_DL_Extender $_extDocLister)
-	{
-		$re = '/,]$/Usi';
-		$subst = ']';
-		$arrstr = $modx->runSnippet('PageBuilder', array(
-			'docid' => $data["id"],
-			'templates' => 'json'
-		));
-		$result = preg_replace($re, $subst, $arrstr);
-		$obj = json_decode($result);
-		$result = htmlspecialchars(json_encode($obj), ENT_QUOTES, 'UTF-8');
-		$data["json"] = $result;
-		$image = $modx->runSnippet("phpthumb", array(
-			'input' => $data['imageSoc'],
-			'options' => 'w=270,h=202,zc=C'
-		));
-		$data["image"] = $image;
-		return $data;
-	}
 }
