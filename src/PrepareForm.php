@@ -17,6 +17,9 @@ class PrepareForm {
 			case "callme":
 				$theme_val = "Заказ звонка";
 				break;
+			case "calc":
+				$theme_val = "Расчёт потолка";
+				break;
 		}
 		$fl->mailConfig['subject']  = $cfg["subject"] = mb_strtoupper($theme_val, $modx->config['modx_charset']) . " с сайта «" . $site . "»";
 		$fl->mailConfig['replyTo']  = $cfg["replyTo"] = $modx->config['email_bot'];
@@ -36,12 +39,22 @@ class PrepareForm {
 		$host = $port . $idna->decode($input) . $url;
 		$theme = $fl->getField("formid");
 		$theme_val = "Заказ звонка";
+		$message = $fl->getField('message');
+		$message = $message ? $message : '';
+		$re = '/^(.*\:|(?:.*))(.*)/m';
+		$subst = '<b>$1</b>$2';
+		$htmlMsg = preg_replace($re, $subst, $message);
+		$htmlMsg = nl2br($htmlMsg);
+		$fl->setField('messageHtml', $htmlMsg);
 		switch($theme){
 			case "zamer":
 				$theme_val = "Вызов замерщика";
 				break;
 			case "callme":
 				$theme_val = "Заказ звонка";
+				break;
+			case "calc":
+				$theme_val = "Расчёт потолка";
 				break;
 		}
 		$fl->setField("pagetitle", $modx->documentObject["pagetitle"]);
@@ -51,22 +64,46 @@ class PrepareForm {
 
 	public static function prepareAfterProcessCallme($modx, $data, $fl, $name)
 	{
+		$theme = $fl->getField("formid");
+		$theme_val = "Заказ звонка";
+		$message = $fl->getField('message');
+		$message = $message ? $message : '';
+		$re = '/^(.*\:|(?:.*))(.*)/m';
+		$subst = '*$1* $2';
+		$message = preg_replace($re, $subst, $message);
+		$page = '' . $modx->documentObject["pagetitle"] . " _" . $fl->getField('url') . "_";
+		$msg_str = 'Страница отправки';
+		$msg_out = $page;
+		switch($theme){
+			case "zamer":
+				$theme_val = "Вызов замерщика";
+				break;
+			case "callme":
+				$theme_val = "Заказ звонка";
+				break;
+			case "calc":
+				$theme_val = "Расчёт потолка";
+				$msg_str = 'Данные расчёта';
+				$msg_out = ":\r\n" . $message . PHP_EOL . '*Страница отправки:* ' . $page;
+				break;
+		}
 		$arr = array(
 			"types" => array(
 				'date'		=>'Дата',
 				'theme'		=>'Тема',
 				'name'		=>'Имя',
 				'phone'		=>'Телефон',
-				'message'	=>'Страница отправки'
+				'message'	=> $msg_str
 			),
 			'fields' => array(
 				'date'		=> date('d.m.Y H:i:s', time() + $modx->config['server_offset_time']),
 				'theme'		=> $fl->getField('theme'),
 				'name'		=> $fl->getField('first_name'),
 				'phone'		=> $fl->getField('phone'),
-				'message'	=> $modx->documentObject["pagetitle"] . " _" . $fl->getField('url') . "_"
+				'message'	=> $msg_out
 			),
 		);
+		$arr["parse_mode"] = "Markdown";
 		$modx->invokeEvent('onSendBot', $arr);
 	}
 }

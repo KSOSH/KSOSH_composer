@@ -49,13 +49,14 @@ class SendBot {
 
 	public function __construct($params)
 	{
+		$this->modx = evolutionCMS();
 		$this->types = is_array($params['types']) ? $params['types'] : array();
 		$this->fields = is_array($params['fields']) ? $params['fields'] : array();
 		$this->before_msg = is_string($params['before_msg']) ? $params['before_msg'] : "";
 		$this->after_msg = is_string($params['after_msg']) ? $params['after_msg'] : "";
 		$this->disable_web_page_preview = is_string($params['disable_web_page_preview']) ? ($params['disable_web_page_preview'] == 'false' ? '&disable_web_page_preview=false' : '&disable_web_page_preview=true') : '&disable_web_page_preview=true';
-		$this->bot_token = $params['bot_token'];
-		$this->chat_id = $params['chat_id'];
+		$this->bot_token = $this->modx->config['bot_token'];
+		$this->chat_id = $this->modx->config['chat_id'];
 		$this->msg = $this->setData();
 		$this->url = $this->formatUrl();
 	}
@@ -69,6 +70,7 @@ class SendBot {
 			$val = trim($this->fields[$key]);
 			if(mb_strlen($val) > 1)
 			{
+				
 				$msg .= '*' . $value . ':* ' . $val . "\n";
 			}
 		}
