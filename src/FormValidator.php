@@ -9,7 +9,7 @@ class FormValidator {
 		if(empty($value)){
 			return false;
 		}
-		$idn = new \ProjectSoft\IdnaConvert(array('idn_version'=>2008));
+		$idn = new \ProjectSoft\idna_convert(array('idn_version'=>2008));
 		$email = $idn->encode($value);
 		return (preg_match("/^([\w-._]+@[\w-._]+\.[\w-]{2,})$/i", $email));
 	}
