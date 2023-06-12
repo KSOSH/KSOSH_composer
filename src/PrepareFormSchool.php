@@ -34,30 +34,36 @@ class PrepareFormSchool {
 
 	public static function prepareAfterProcess($modx, $data, $fl, $name)
 	{
+		$theme = $fl->getField("formid");
+		$theme_val = "Вопрос с сайта " . $modx->config['site_name'];
 		$message = $fl->getField('message');
 		$message = $message ? $message : '';
-		$url = $fl->getField("pagetitle") . " _" . $fl->getField('url') . "_";
+		$re = '/^(.*\:|(?:.*))(.*)/m';
+		$subst = '*$1* $2';
+		$message = preg_replace($re, $subst, $message);
+		$page = '' . $modx->documentObject["pagetitle"] . " _" . $fl->getField('url') . "_";
+		$msg_str = 'Страница отправки';
 		$arr = array(
 			"types" => array(
-				'date'		=>'Дата',
-				'theme'		=>'Тема',
+				'date'		=> 'Дата',
+				'theme'		=> 'Тема',
+				'name'		=> 'Имя',
 				'email'		=> 'Email',
-				'name'		=>'Имя',
-				'phone'		=>'Телефон',
+				'phone'		=> 'Телефон',
 				'message'	=> 'Сообщение',
 				'url'		=> 'Страница отправки'
 			),
-			'fields' => array(
+			"fields" => array(
 				'date'		=> date('d.m.Y H:i:s', time() + $modx->config['server_offset_time']),
-				'theme'		=> $fl->getField('theme'),
-				'email'		=> $fl->getField('email'),,
+				'theme'		=> $theme_val,
 				'name'		=> $fl->getField('first_name'),
+				'email'		=> $fl->getField('email'),
 				'phone'		=> $fl->getField('phone'),
 				'message'	=> $message,
-				'url'		=> $url
+				'url'		=> $page
 			),
+			"parse_mode" => "MarkdownV2",
 		);
-		$arr["parse_mode"] = "Markdown";
 		$modx->invokeEvent('onSendBot', $arr);
 	}
 }

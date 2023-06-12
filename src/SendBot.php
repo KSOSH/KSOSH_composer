@@ -42,7 +42,7 @@ class SendBot {
 	private $after_msg = '';
 	private $bot_token;
 	private $chat_id;
-	private $parse_mode = 'Markdown';
+	private $parse_mode = 'MarkdownV2';
 	private $msg = '';
 	private $url = '';
 	private $disable_web_page_preview = '';
@@ -50,13 +50,14 @@ class SendBot {
 	public function __construct($params)
 	{
 		$this->modx = evolutionCMS();
+		$this->parse_mode = is_string($params['parse_mode']) ? ($params['parse_mode'] == 'Markdown' || $params['parse_mode'] == 'MarkdownV2' ? $params['parse_mode'] : 'HTML') : 'MarkdownV2';
 		$this->types = is_array($params['types']) ? $params['types'] : array();
 		$this->fields = is_array($params['fields']) ? $params['fields'] : array();
 		$this->before_msg = is_string($params['before_msg']) ? $params['before_msg'] : "";
 		$this->after_msg = is_string($params['after_msg']) ? $params['after_msg'] : "";
 		$this->disable_web_page_preview = is_string($params['disable_web_page_preview']) ? ($params['disable_web_page_preview'] == 'false' ? '&disable_web_page_preview=false' : '&disable_web_page_preview=true') : '&disable_web_page_preview=true';
-		$this->bot_token = $this->modx->config['bot_token'];
-		$this->chat_id = $this->modx->config['chat_id'];
+		$this->bot_token = is_string($params['bot_token']) ? $params['bot_token'] : $this->modx->config['bot_token'];
+		$this->chat_id = is_string($params['chat_id']) ? $params['chat_id'] : $this->modx->config['chat_id'];
 		$this->msg = $this->setData();
 		$this->url = $this->formatUrl();
 	}

@@ -64,6 +64,8 @@ class PrepareForm {
 
 	public static function prepareAfterProcessCallme($modx, $data, $fl, $name)
 	{
+		$id = $modx->documentIdentifier;
+		$url = $modx->makeUrl($id, '', '');
 		$theme = $fl->getField("formid");
 		$theme_val = "Заказ звонка";
 		$message = $fl->getField('message');
@@ -102,8 +104,43 @@ class PrepareForm {
 				'phone'		=> $fl->getField('phone'),
 				'message'	=> $msg_out
 			),
+			"parse_mode" => "Markdown",
 		);
-		$arr["parse_mode"] = "Markdown";
+		$modx->invokeEvent('onSendBot', $arr);
+	}
+
+	public static function prepareAfterProcessQuestion($modx, $data, $fl, $name)
+	{
+		$theme = $fl->getField("formid");
+		$theme_val = "Вопрос с сайта " . $modx->config['site_name'];
+		$message = $fl->getField('message');
+		$message = $message ? $message : '';
+		$re = '/^(.*\:|(?:.*))(.*)/m';
+		$subst = '*$1* $2';
+		$message = preg_replace($re, $subst, $message);
+		$page = '' . $modx->documentObject["pagetitle"] . " _" . $fl->getField('url') . "_";
+		$msg_str = 'Страница отправки';
+		$arr = array(
+			"types" => array(
+				'date'		=> 'Дата',
+				'theme'		=> 'Тема',
+				'name'		=> 'Имя',
+				'email'		=> 'Email',
+				'phone'		=> 'Телефон',
+				'message'	=> 'Сообщение',
+				'url'		=> 'Страница отправки'
+			),
+			"fields" => array(
+				'date'		=> date('d.m.Y H:i:s', time() + $modx->config['server_offset_time']),
+				'theme'		=> $theme_val,
+				'name'		=> $fl->getField('first_name'),
+				'email'		=> $fl->getField('email'),
+				'phone'		=> $fl->getField('phone'),
+				'message'	=> $message,
+				'url'		=> $page
+			),
+			"parse_mode" => "Markdown",
+		);
 		$modx->invokeEvent('onSendBot', $arr);
 	}
 }
