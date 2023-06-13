@@ -50,7 +50,7 @@ class SendBot {
 	public function __construct($params)
 	{
 		$this->modx = evolutionCMS();
-		$this->parse_mode = is_string($params['parse_mode']) ? ($params['parse_mode'] == 'Markdown' || $params['parse_mode'] == 'MarkdownV2' ? $params['parse_mode'] : 'HTML') : 'MarkdownV2';
+		$this->parse_mode = is_string($params['parse_mode']) ? ($params['parse_mode'] == 'Markdown' || $params['parse_mode'] == 'MarkdownV2' ? 'Markdown' : 'HTML') : 'MarkdownV2';
 		$this->types = is_array($params['types']) ? $params['types'] : array();
 		$this->fields = is_array($params['fields']) ? $params['fields'] : array();
 		$this->before_msg = is_string($params['before_msg']) ? $params['before_msg'] : "";
@@ -97,6 +97,7 @@ class SendBot {
 
 	public function send(){
 		$url = $this->url;
+		file_put_contents('0002-result.txt', print_r($url, true));
 		$ch = curl_init();
 		$optArray = array(
 				CURLOPT_URL => $url,

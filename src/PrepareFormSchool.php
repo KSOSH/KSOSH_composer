@@ -40,8 +40,25 @@ class PrepareFormSchool {
 		$message = $message ? $message : '';
 		$re = '/^(.*\:|(?:.*))(.*)/m';
 		$subst = '*$1* $2';
-		$message = preg_replace($re, $subst, $message);
+		$re = '/([~>#+=|{}.!-])/i';
+		$subst = "\\\\.";
+		//$message = preg_replace($re, $subst, $message);
+
 		$page = '' . $modx->documentObject["pagetitle"] . " _" . $fl->getField('url') . "_";
+		//$page = preg_replace($re, $subst, $page);
+
+		$first_name = $fl->getField('first_name');
+		//$first_name = preg_replace($re, $subst, $first_name);
+
+		$email = $fl->getField('email');
+		//$email = preg_replace($re, $subst, $email);
+
+		$phone = $fl->getField('phone');
+		//$phone = preg_replace($re, $subst, $phone);
+
+		$date = date('d.m.Y H:i:s', time() + $modx->config['server_offset_time']);
+		//$date = preg_replace($re, $subst, $date);
+
 		$arr = array(
 			"types" => array(
 				'date'		=> 'Дата',
@@ -55,16 +72,32 @@ class PrepareFormSchool {
 			"fields" => array(
 				'date'		=> date('d.m.Y H:i:s', time() + $modx->config['server_offset_time']),
 				'theme'		=> $theme_val,
-				'name'		=> $fl->getField('first_name'),
-				'email'		=> $fl->getField('email'),
-				'phone'		=> $fl->getField('phone'),
+				'name'		=> $first_name,
+				'email'		=> $email,
+				'phone'		=> $phone,
 				'message'	=> $message,
 				'url'		=> $page
 			),
-			"parse_mode"	=> "MarkdownV2",
+			"parse_mode"	=> "Markdown",
 			"bot_token"		=> $modx->config["bot_token"],
-			"chat_id"		=> $modx->config["chat_id"]
+			"chat_id"		=> $modx->config["tlg_chanel"]
 		);
-		$modx->invokeEvent('onSendBot', $arr);
+		//file_put_contents('formsend.txt', print_r($arr, true));
+		//$modx->invokeEvent('onSendBot', $arr);
+		$bot = new \ProjectSoft\SendBot($arr);
+		$result = $bot->send();
+		file_put_contents('0001-result.txt', print_r($result, true));
+		$json = json_decode($result);
+		if(is_object($json)):
+			if(!$json->ok):
+				$fl->setFormStatus(false);
+				$fl->addMessage($json->description);
+				//$fl->setFormStatus(false);
+			endif;
+		else:
+			$fl->setFormStatus(false);
+			$fl->addMessage($result);
+			//$fl->setFormStatus(false);
+		endif;
 	}
 }
